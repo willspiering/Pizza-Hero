@@ -1,7 +1,8 @@
 import * as React from "react";
 import { render } from "react-dom";
+import styled from "styled-components";
 
-import "./styles.css";
+import "./styles.scss";
 
 // Pizza Utilities
 //area of 1 pizza in sq.in
@@ -18,15 +19,15 @@ let totalPizzaArea = (size, numberOfPizzas) => {
 };
 //price per sq inch
 let pricePerSqIn = (unitPrice, totalPizzaArea, numberOfPizzas) => {
-  return (unitPrice * numberOfPizzas) / totalPizzaArea;
+  return ((unitPrice * numberOfPizzas) / totalPizzaArea).toFixed(2);
 };
 //price per slice
 let pricePerSlice = (unitPrice, slicesPerPizza) => {
-  return unitPrice / slicesPerPizza;
+  return (unitPrice / slicesPerPizza).toFixed(2);
 };
 // total cost
 let totalPrice = (unitPrice, numberOfPizzas) => {
-  return unitPrice * numberOfPizzas;
+  return (unitPrice * numberOfPizzas).toFixed(2);
 };
 
 interface PizzaBuildState {
@@ -44,10 +45,10 @@ interface PizzaBuildState {
 
 const DEFAULTSTATE: PizzaBuildState = {
   id: "",
-  size: 0,
+  size: 12,
   unitPrice: 0,
-  numberOfPizzas: 0,
-  slices: 0,
+  numberOfPizzas: 1,
+  slices: 6,
   areaOfPizza: 0,
   totalArea: 0,
   pricePerSqIn: 0,
@@ -58,10 +59,10 @@ const DEFAULTSTATE: PizzaBuildState = {
 function PizzaForm(props) {
   //const [pizzaState, setPizzaState] = React.useState(DEFAULTSTATE);
   const [pizzaBuild, setPizzaBuild] = React.useState(DEFAULTSTATE);
-  const [pizzaSize, setPizzaSize] = React.useState(0);
+  const [pizzaSize, setPizzaSize] = React.useState(18);
   const [pizzaPrice, setPizzaPrice] = React.useState(0);
-  const [pizzaQuantity, setPizzaQuantity] = React.useState(0);
-  const [pizzaSlices, setPizzaSlices] = React.useState(0);
+  const [pizzaQuantity, setPizzaQuantity] = React.useState(1);
+  const [pizzaSlices, setPizzaSlices] = React.useState(6);
 
   const handleSize = e => {
     setPizzaSize(e);
@@ -112,52 +113,75 @@ function PizzaForm(props) {
   };
 
   return (
-    <div>
-      <div>
-        <div>
-          Price Per Sq. Inch:
-          {pricePerSqIn(
-            pizzaPrice,
-            totalPizzaArea(pizzaSize, pizzaQuantity),
-            pizzaQuantity
-          )}
+    <div className="pizzaForm">
+      <div className="currentBuild">
+        <div className="stat">
+          <span className="statLabel">Price Per Sq. Inch</span>
+          <span className="statNumber">
+            $
+            {pricePerSqIn(
+              pizzaPrice,
+              totalPizzaArea(pizzaSize, pizzaQuantity),
+              pizzaQuantity
+            )}
+          </span>
         </div>
-        <div>Price Per Slice: {pricePerSlice(pizzaPrice, pizzaSlices)}</div>
-        <div>Total Price: {totalPrice(pizzaPrice, pizzaQuantity)}</div>
-        <div>Pizza Size: {pizzaSize}</div>
+        <div className="stat">
+          <span className="statLabel">Price Per Slice</span>
+          <span className="statNumber">
+            ${pricePerSlice(pizzaPrice, pizzaSlices)}
+          </span>
+        </div>
+        <div className="stat">
+          <span className="statLabel">Total Price</span>
+          <span className="statNumber">
+            ${totalPrice(pizzaPrice, pizzaQuantity)}
+          </span>
+        </div>
+        {console.log("Pizza Size: ", pizzaSize)
+        /* <div>Pizza Size: {pizzaSize}</div>
         <div>Unit Price: {pizzaPrice}</div>
         <div>Quantity: {pizzaQuantity}</div>
-        <div>Slices per Pizza: {pizzaSlices}</div>
+        <div>Slices per Pizza: {pizzaSlices}</div> */
+        }
       </div>
-      <label htmlFor="">Pizza Size: </label>
-      <input
-        type="text"
-        value={pizzaSize}
-        onChange={e => handleSize(e.target.value)}
-      />
-      <br />
-      <label htmlFor="">Unit Price: </label>
-      <input
-        type="text"
-        value={pizzaPrice}
-        onChange={e => handlePrice(e.target.value)}
-      />
-      <br />
-      <label htmlFor="">Number of Pizzas: </label>
-      <input
-        type="text"
-        value={pizzaQuantity}
-        onChange={e => handleQuantity(e.target.value)}
-      />
-      <br />
-      <label htmlFor="">Slices per Pizza: </label>
-      <input
-        type="text"
-        value={pizzaSlices}
-        onChange={e => handleSlices(e.target.value)}
-      />
-      <br />
-      <button onClick={buildPizza}>Build Pizza</button>
+      <div className="inputSection">
+        <label htmlFor="">Pizza Size: </label>
+        <input
+          type="range"
+          value={pizzaSize}
+          min={10}
+          max={42}
+          step={1}
+          onChange={e => handleSize(e.target.value)}
+        />
+
+        <br />
+        <label htmlFor="">Unit Price: </label>
+        <input
+          type="number"
+          value={pizzaPrice}
+          min={0}
+          max={100}
+          onChange={e => handlePrice(e.target.value)}
+        />
+        <br />
+        <label htmlFor="">Number of Pizzas: </label>
+        <input
+          type="text"
+          value={pizzaQuantity}
+          onChange={e => handleQuantity(e.target.value)}
+        />
+        <br />
+        <label htmlFor="">Slices per Pizza: </label>
+        <input
+          type="text"
+          value={pizzaSlices}
+          onChange={e => handleSlices(e.target.value)}
+        />
+        <br />
+        <button onClick={buildPizza}>Build Pizza</button>
+      </div>
     </div>
   );
 }
@@ -197,14 +221,70 @@ function App() {
     setPizzaList(pizzaList => pizzaList.filter(t => t.id !== id));
   };
   return (
-    <div className="App">
-      <h1 onClick={() => console.log("PizzaList: ", pizzaList)}>Pizza Hero</h1>
-      <h2>Compare pizza prices, get the most dough for your $dough$</h2>
-      <PizzaForm updateList={addPizzaBuild} />
-      <ResultsList list={pizzaList} removeBuild={removePizzaBuild} />
-    </div>
+    <StyledApp theme={theme}>
+      <div>
+        <h1 onClick={() => console.log("PizzaList: ", pizzaList)}>
+          Pizza Hero
+        </h1>
+        <h2>Compare pizza prices, get the most dough for your $dough$</h2>
+      </div>
+      <section>
+        <PizzaForm updateList={addPizzaBuild} />
+        <ResultsList list={pizzaList} removeBuild={removePizzaBuild} />
+      </section>
+    </StyledApp>
   );
 }
+
+const theme = {
+  black: "#171a21",
+  nickel: "#617073",
+  tertiary: "#68b684",
+  secondary: "#337357",
+  primary: "#db504a"
+};
+
+const StyledApp = styled.div`
+  color: white;
+  .pizzaForm {
+    max-width: 375px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: ${theme.tertiary};
+    color: ${theme.black};
+  }
+  .currentBuild {
+    background: white;
+    display: flex;
+    padding: 0 15px;
+    text-align: center;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 70px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    .stat {
+      flex: 0 0 100px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .statLabel {
+      font-size: 12px;
+      width: 100%;
+    }
+    .statNumber {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 24px;
+      font-weight: bold;
+      width: 100%;
+    }
+  }
+  .inputSection {
+    padding: 15px;
+  }
+`;
 
 const rootElement = document.getElementById("root");
 render(<App />, rootElement);

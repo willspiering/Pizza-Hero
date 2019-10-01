@@ -1,0 +1,17 @@
+// Import a Google Font
+@import url('https://fonts.googleapis.com/css?family=Nunito:400,700');
+
+// colors
+$black: #171A21;
+$nickel: #617073;
+$tertiary: #68B684;
+$secondary: #337357;
+$primary: #DB504A;
+
+
+$family-sans-serif: 'Nunito', sans-serif;
+
+body {
+  background: $secondary;
+  font-family: $family-sans-serif;
+}
